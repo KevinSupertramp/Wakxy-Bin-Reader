@@ -1,18 +1,33 @@
 #include "binreader.h"
 
-BinReader::BinReader()
+BinReader::BinReader(QString filePath, QObject *parent) :
+    QObject(parent)
 {
+    m_stop = false;
+    m_filePath = filePath;
 }
 
-
-void BinReader::doWork()
+void BinReader::read()
 {
+    m_stop = false;
     int max = 100;
-    emit startWork(max);
 
     for(int i = 0; i <= max; i++)
     {
-        emit progress(i);
-        QThread::msleep(1000);
+        if(m_stop) return;
+
+        emit onReadLine(); //read line done
+        emit progressChanged(i*100/max);
+
+        QThread::currentThread()->msleep(100); //100 ms sleep
     }
+}
+
+//=====================
+// SLOT ===============
+//=====================
+
+void BinReader::stop()
+{
+    m_stop = true;
 }

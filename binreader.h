@@ -3,20 +3,28 @@
 
 #include <QObject>
 #include <QThread>
+#include <QDebug>
 
 class BinReader : public QObject
 {
     Q_OBJECT
+public:
+    BinReader();
+    explicit BinReader(QString filePath, QObject *parent = 0);
+    void read();
+
+private:
+    bool m_stop;
+    QString m_filePath;
 
 signals:
-    void progress(int progressValue);
-    void startWork(int maxValue);
+    void onReadLine(); //read line complete
+    void progressChanged(int percent); //Progress changed
 
 public slots:
-    void doWork();
+    void stop(); //stop the current reading
 
-public:
-    BinReader(); 
+
 };
 
 #endif // BINREADER_H

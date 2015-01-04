@@ -17,8 +17,25 @@
    <string>Wakxy - Bin Reader</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QPushButton" name="pushButtonCancel">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Annuler</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QProgressBar" name="progressBarFileReader">
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
      <widget class="QTableWidget" name="tableWidgetFile">
       <property name="acceptDrops">
        <bool>false</bool>
@@ -28,18 +45,6 @@
       </property>
       <property name="sortingEnabled">
        <bool>true</bool>
-      </property>
-      <column>
-       <property name="text">
-        <string>Test</string>
-       </property>
-      </column>
-     </widget>
-    </item>
-    <item>
-     <widget class="QProgressBar" name="progressBarFileReader">
-      <property name="value">
-       <number>0</number>
       </property>
      </widget>
     </item>
@@ -77,6 +82,9 @@
    </property>
   </action>
   <action name="actionSauvegarderCSV">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Sauvegarder en CSV</string>
    </property>
@@ -88,7 +96,7 @@
   </action>
   <action name="actionListesScripts">
    <property name="text">
-    <string>Listes des scripts</string>
+    <string>Dossier des scripts</string>
    </property>
   </action>
  </widget>
