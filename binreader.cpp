@@ -12,6 +12,8 @@ void BinReader::read()
     m_stop = false;
     int max = 100;
 
+    BinaryDocument* doc = new BinaryDocument(m_filePath, 1);
+
     for(int i = 0; i <= max; i++)
     {
         if(m_stop) return;

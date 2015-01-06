@@ -5,6 +5,10 @@
 #include <QThread>
 #include <QDebug>
 
+#include "binarydocument.h"
+#include "binarydocumentindex.h"
+#include "randombytebufferreader.h"
+
 class BinReader : public QObject
 {
     Q_OBJECT

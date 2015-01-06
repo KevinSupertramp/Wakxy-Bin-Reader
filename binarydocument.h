@@ -2,7 +2,7 @@
 #define BINARYDOCUMENT_H
 
 #include <QObject>
-#include <QBuffer>
+#include <QDataStream>
 #include "binarydocumentindex.h"
 #include "randombytebufferreader.h"
 
@@ -21,12 +21,14 @@ class BinaryDocument : public QObject
      Q_OBJECT
 
 public:
-    BinaryDocument(QString filename, int dateTypeId);
+    BinaryDocument(QString filepath, int dateTypeId);
+
+protected:
+    void readHeader();
 
 private:
-
-    QBitArray m_bytes;
-    QString m_filename;
+    QByteArray m_bit;
+    QString m_filepath;
     int m_dataTypeId;
 
     //================
