@@ -14,9 +14,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    binreader.cpp
+    binreader.cpp \
+    binarydocument.cpp \
+    binarydocumentindex.cpp \
+    randombytebufferreader.cpp
 
 HEADERS  += mainwindow.h \
-    binreader.h
+    binreader.h \
+    binarydocument.h \
+    binarydocumentindex.h \
+    randombytebufferreader.h
 
 FORMS    += mainwindow.ui
