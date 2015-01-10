@@ -19,10 +19,12 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     emit onCancelRead(); //cancel the read
+    delete m_watcher;
+    delete m_binReader;
     delete ui;
 }
 
- void MainWindow::dragEnterEvent(QDragEnterEvent * event)
+ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
  {
     if(m_watcher && m_watcher->isRunning()) //reading in progress, can't drag
     {
@@ -34,9 +36,9 @@ MainWindow::~MainWindow()
 
         if(urlList.size() == 1)
         {
-            QFileInfo* dragFile = new QFileInfo(urlList[0].toLocalFile());
+            QFileInfo dragFile(urlList[0].toLocalFile());
 
-            if(dragFile->exists() && dragFile->suffix() == DRAG_TYPE_FILE)
+            if(dragFile.exists() && dragFile.suffix() == DRAG_TYPE_FILE)
                 event->acceptProposedAction();
             else
                 event->ignore();
@@ -93,7 +95,7 @@ MainWindow::~MainWindow()
 
  void MainWindow::onReadLine()
  {
-     qDebug() << "add the line read on table...";
+     //qDebug() << "add the line read on table...";
  }
 
  void MainWindow::onProgressChanged(int percent)

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDataStream>
+#include <QBitArray>
 #include "binarydocumentindex.h"
 #include "randombytebufferreader.h"
 
@@ -10,10 +11,10 @@
 
 struct strBinaryDocumentEntry
 {
-    long id;
+    qint64 id;
     int pos;
     int size;
-    QBitArray seed;
+    qint8 seed;
 };
 
 class BinaryDocument : public QObject
@@ -22,12 +23,13 @@ class BinaryDocument : public QObject
 
 public:
     BinaryDocument(QString filepath, int dateTypeId);
+    ~BinaryDocument();
 
 protected:
     void readHeader();
 
 private:
-    QByteArray m_bit;
+    QByteArray m_fileByteArray;
     QString m_filepath;
     int m_dataTypeId;
 
@@ -43,6 +45,7 @@ private:
 
     //===================
     //data ==============
+    QByteArray m_dataByteArray;
     RandomByteBufferReader* m_dataBuffer;
     //==================
 };

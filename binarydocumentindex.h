@@ -2,12 +2,14 @@
 #define BINARYDOCUMENTINDEX_H
 
 #include <QObject>
+#include "randombytebufferreader.h"
 
 class BinaryDocumentIndex : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit BinaryDocumentIndex(QObject *parent = 0);
+    BinaryDocumentIndex(RandomByteBufferReader* reader);
 
 signals:
 

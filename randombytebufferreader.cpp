@@ -1,48 +1,114 @@
 #include "randombytebufferreader.h"
 
-
-RandomByteBufferReader::RandomByteBufferReader(QByteArray bit, int mult, int add)
+RandomByteBufferReader::RandomByteBufferReader(QByteArray byte, qint64 pos, int mult, int add)
 {
     //================
     //randomizer =====
     m_mult = mult;
     m_add = add;
+    m_seed = (qint8)(m_mult ^ m_add);
 
-    QDataStream steam(&m_seed, QIODevice::ReadWrite);
-    steam << (m_mult ^ m_add);
+    qDebug() << m_seed;
 
-    /*
-    Un peu de théorie, dans notre seed nous avous notre valeur comme ceci :
-    0x000005A5 = 00000000 00000000 00000101 10100101  (1445)
-    sauf que ce n'est pas comme quand on fait un (byte) (monmachin) en java
-    enfaite je crois qu'il fait ceci :
-    0xFFFFFFA5 = 11111111 11111111 11111111 10100101  (-91)
-
-    Un bon sujet : http://stackoverflow.com/questions/842817/how-does-java-convert-int-into-byte
-
-    Le debugger de qt me balance bien pour mon seed[5] -91/165 ;
-    Comment peut-on obtenir le -91 ?
-    Il faut juste garder le dernier octet et passer tout les autres a 255.
-    */
-    //================
-
-    m_bit = bit;
-    m_buffer = new QDataStream(m_bit);
+    m_byteArray = byte;
+    m_buffer = new QDataStream(m_byteArray);
     m_buffer->setByteOrder(QDataStream::LittleEndian);
+    m_buffer->device()->seek(pos);
+}
+
+RandomByteBufferReader::~RandomByteBufferReader()
+{
+    delete m_buffer;
+}
+
+//=====================
+//read ================
+
+qint8 RandomByteBufferReader::readByte()
+{
+    inc();
+
+    qint8 value;
+    *m_buffer >> value;
+    return (value - m_seed);
 }
 
 int RandomByteBufferReader::readInt()
 {
     inc();
-    uint size = sizeof(int); //type size
 
     int value;
+    *m_buffer >> value;
+    return (value - m_seed);
+}
+
+
+bool RandomByteBufferReader::readBool()
+{
+    inc();
+
+    qint8 value;
+    *m_buffer >> value;
+    return (value - m_seed != 0);
+}
+
+short RandomByteBufferReader::readShort()
+{
+    inc();
+
+    short value;
+    *m_buffer >> value;
+
+    return value - m_seed;
+}
+
+float RandomByteBufferReader::readFloat()
+{
+    inc();
+
+    float value;
     *m_buffer >> value;
 
     return value;
 }
 
-void RandomByteBufferReader::setPosition(qint64 position, QByteArray seed)
+double RandomByteBufferReader::readDouble()
+{
+    inc();
+
+    double value;
+    *m_buffer >> value;
+
+    return value;
+}
+
+qint64 RandomByteBufferReader::readLong()
+{
+    inc();
+
+    qint64 value;
+    *m_buffer >> value;
+
+    return value - m_seed;
+}
+
+QString RandomByteBufferReader::readString()
+{
+    int size;
+    QByteArray data;
+
+    *m_buffer >> size;
+
+    for (int i = 0; i < size; ++i) {
+        data.append(readByte());
+    };
+
+    return QString(data);
+}
+
+//===========================
+
+void RandomByteBufferReader::setPosition(qint64 position, qint8 seed)
 {
     m_buffer->device()->seek(position);
     m_seed = seed;
@@ -50,5 +116,5 @@ void RandomByteBufferReader::setPosition(qint64 position, QByteArray seed)
 
 void RandomByteBufferReader::inc()
 {
-    m_seed += QByteArray::number(m_mult * position() + m_add); //DNU
+    m_seed += (qint8)(m_mult * position() + m_add);
 }

@@ -12,9 +12,10 @@
 class BinReader : public QObject
 {
     Q_OBJECT
+
 public:
-    BinReader();
-    explicit BinReader(QString filePath, QObject *parent = 0);
+    BinReader(QString filePath);
+    ~BinReader();
     void read();
 
 private:

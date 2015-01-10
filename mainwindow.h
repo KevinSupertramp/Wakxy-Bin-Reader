@@ -49,8 +49,8 @@ private:
 
     void UpdateUI(bool readComplete);
 
-    BinReader* m_binReader;
-    QFutureWatcher<void>* m_watcher;
+    BinReader *m_binReader;
+    QFutureWatcher<void> *m_watcher;
 };
 
 #endif // MAINWINDOW_H
