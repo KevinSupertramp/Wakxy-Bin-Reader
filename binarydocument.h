@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QDataStream>
 #include <QBitArray>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+
 #include "binarydocumentindex.h"
 #include "randombytebufferreader.h"
 
@@ -24,11 +27,26 @@ class BinaryDocument : public QObject
 public:
     BinaryDocument(QString filepath, int dateTypeId);
     ~BinaryDocument();
+    void readDocument(); //read the current document
+
+signals:
+    void progressChanged(int percent); //progress changed
+    //=============
+    //data signal =
+    void version(int version);
+    void newEntry(qint64 id, int pos, int size, qint8 seed);
+    void newIndex(BinaryDocumentIndex* index);
+    //=============
+
+public slots:
+    void stopRead() { m_stop = true; }
 
 protected:
     void readHeader();
 
 private:
+    bool m_stop;
+
     QByteArray m_fileByteArray;
     QString m_filepath;
     int m_dataTypeId;
@@ -41,12 +59,13 @@ private:
     QMap<int, strBinaryDocumentEntry> m_entries;
 
     int m_indexCount;
-    QMap<QString, BinaryDocumentIndex> m_indexes;
+    QMap<QString, BinaryDocumentIndex*> m_indexes;
 
     //===================
     //data ==============
     QByteArray m_dataByteArray;
     RandomByteBufferReader* m_dataBuffer;
+    void ReadLine();
     //==================
 };
 

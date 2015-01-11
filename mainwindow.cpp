@@ -6,8 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
     m_watcher = new QFutureWatcher<void>();
+
 
     //==================
     //connect ==========
@@ -20,7 +20,7 @@ MainWindow::~MainWindow()
 {
     emit onCancelRead(); //cancel the read
     delete m_watcher;
-    delete m_binReader;
+    delete m_binaryDocument;
     delete ui;
 }
 
@@ -60,20 +60,43 @@ MainWindow::~MainWindow()
  void MainWindow::readFile(QString filePath)
  {
      emit onCancelRead(); //cancel current read
-
      ui->progressBarFileReader->setValue(0); //reset progress bar value
      UpdateUI(false);
 
-     //connect my reader on the correct function
-     m_binReader = new BinReader(filePath); //setup binary reader
+     //get the dataTypeId
+     QFileInfo fileInfo(filePath);
+     int dataTypeId;
+     bool conversionOk;
+     dataTypeId = fileInfo.baseName().toInt(&conversionOk);
 
-     connect(m_binReader, &BinReader::onReadLine, this, &MainWindow::onReadLine);
-     connect(this, &MainWindow::onCancelRead, m_binReader, &BinReader::stop);
-     connect(m_binReader, &BinReader::progressChanged, this, &MainWindow::onProgressChanged);
+     if(!conversionOk)
+     {
+         ui->pushButtonCancel->setEnabled(false);
+         return;
+     }
 
-     QFuture<void> separateThread = QtConcurrent::run(m_binReader, &BinReader::read); //run inside another thread
-     m_watcher->setFuture(separateThread); //connect watcher
+     //======
+     //ui ===
+     ui->lineEditDataTypeId->setText(QString::number(dataTypeId));
+     ui->tableWidgetDocumentEntry->setRowCount(0);
+     ui->tableWidgetFile->setRowCount(0);
+     ui->treeWidgetIndexes->clear();
+     //=======
+
+     m_binaryDocument = new BinaryDocument(filePath, dataTypeId); //setup binary reader
+
+     //ui signal
+     connect(m_binaryDocument, &BinaryDocument::version, this, &MainWindow::onVersion);
+     connect(m_binaryDocument, &BinaryDocument::newEntry, this, &MainWindow::onNewEntry);
+     connect(m_binaryDocument, &BinaryDocument::newIndex, this, &MainWindow::onNewIndex);
+
+     //thread signal
+     connect(this, &MainWindow::onCancelRead, m_binaryDocument, &BinaryDocument::stopRead);
+     connect(m_binaryDocument, &BinaryDocument::progressChanged, this, &MainWindow::onProgressChanged);
+
+     QFuture<void> separateThread = QtConcurrent::run(m_binaryDocument, &BinaryDocument::readDocument); //run inside another thread
      connect(m_watcher, SIGNAL(finished()), this, SLOT(onReadComplete())); //done signal
+     m_watcher->setFuture(separateThread); //connect watcher
  }
 
  void MainWindow::UpdateUI(bool readComplete)
@@ -96,6 +119,46 @@ MainWindow::~MainWindow()
  void MainWindow::onReadLine()
  {
      //qDebug() << "add the line read on table...";
+ }
+
+ void MainWindow::onVersion(int version)
+ {
+     ui->lineEditVersion->setText(QString::number(version));
+ }
+
+ void MainWindow::onNewEntry(qint64 id, int pos, int size, qint8 seed)
+ {
+     int index = ui->tableWidgetDocumentEntry->rowCount();
+     ui->tableWidgetDocumentEntry->insertRow(index);
+
+     ui->tableWidgetDocumentEntry->setItem(index, 0, new QTableWidgetItem(QString::number(id)));
+     ui->tableWidgetDocumentEntry->setItem(index, 1, new QTableWidgetItem(QString::number(pos)));
+     ui->tableWidgetDocumentEntry->setItem(index, 2, new QTableWidgetItem(QString::number(size)));
+     ui->tableWidgetDocumentEntry->setItem(index, 3, new QTableWidgetItem(QString::number(seed)));
+ }
+
+ void MainWindow::onNewIndex(BinaryDocumentIndex* index)
+ {
+    QTreeWidgetItem* itemRoot = new QTreeWidgetItem(); //root item
+    itemRoot->setText(0, index->getName()); //name
+
+    //data
+    QMap<qint64, QList<int> > indexes = index->getIndexes();
+    for(QMap<qint64, QList<int> >::iterator itr = indexes.begin(); itr != indexes.end(); ++itr)
+    {
+         QTreeWidgetItem* itemChild = new QTreeWidgetItem(itemRoot);
+         itemChild->setText(0, QString::number(itr.key()));
+
+         QList<int> values = itr.value();
+         foreach(int i, values)
+         {
+            QTreeWidgetItem* itemChildSecond = new QTreeWidgetItem(itemChild);
+            itemChildSecond->setText(0, QString::number(i));
+         }
+    }
+
+    //add
+    ui->treeWidgetIndexes->addTopLevelItem(itemRoot);
  }
 
  void MainWindow::onProgressChanged(int percent)

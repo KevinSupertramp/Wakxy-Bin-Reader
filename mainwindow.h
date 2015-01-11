@@ -10,8 +10,9 @@
 #include <QThread>
 #include <QtConcurrent>
 #include <QFileDialog>
+#include <QInputDialog>
 
-#include "binreader.h"
+#include "binarydocument.h"
 
 #define DRAG_TYPE_FILE "bin"
 #define UI_OPEN_TYPE_FILE "Fichier binaire (*.bin)"
@@ -33,13 +34,17 @@ signals:
     void onCancelRead();
 
 private slots:
-    void onReadLine();
-    void onReadComplete();
-    void onProgressChanged(int percent);
-
     //ui
     void onBtnCancelClick();
     void onActionOpen();
+
+    //binarydocument
+    void onVersion(int version);
+    void onNewEntry(qint64 id, int pos, int size, qint8 seed);
+    void onNewIndex(BinaryDocumentIndex *index);
+    void onReadLine();
+    void onReadComplete();
+    void onProgressChanged(int percent);
 
 private:
     Ui::MainWindow *ui;
@@ -49,7 +54,7 @@ private:
 
     void UpdateUI(bool readComplete);
 
-    BinReader *m_binReader;
+    BinaryDocument *m_binaryDocument;
     QFutureWatcher<void> *m_watcher;
 };
 

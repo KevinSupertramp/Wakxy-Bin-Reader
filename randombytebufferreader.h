@@ -16,7 +16,7 @@ public:
 
     qint64 position() { return m_buffer->device()->pos(); }
 
-    qint8 readByte(); //get in RandomByteBufferjava
+    qint8 readByte(); //get() in RandomByteBuffer.java
     int readInt();
     bool readBool();
     short readShort();

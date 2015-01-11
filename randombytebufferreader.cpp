@@ -6,9 +6,7 @@ RandomByteBufferReader::RandomByteBufferReader(QByteArray byte, qint64 pos, int 
     //randomizer =====
     m_mult = mult;
     m_add = add;
-    m_seed = (qint8)(m_mult ^ m_add);
-
-    qDebug() << m_seed;
+    m_seed = m_mult ^ m_add;
 
     m_byteArray = byte;
     m_buffer = new QDataStream(m_byteArray);
@@ -27,9 +25,8 @@ RandomByteBufferReader::~RandomByteBufferReader()
 qint8 RandomByteBufferReader::readByte()
 {
     inc();
-
     qint8 value;
-    *m_buffer >> value;
+    *m_buffer >> value;  
     return (value - m_seed);
 }
 
@@ -46,7 +43,6 @@ int RandomByteBufferReader::readInt()
 bool RandomByteBufferReader::readBool()
 {
     inc();
-
     qint8 value;
     *m_buffer >> value;
     return (value - m_seed != 0);
@@ -55,55 +51,59 @@ bool RandomByteBufferReader::readBool()
 short RandomByteBufferReader::readShort()
 {
     inc();
-
     short value;
     *m_buffer >> value;
-
     return value - m_seed;
 }
 
 float RandomByteBufferReader::readFloat()
 {
     inc();
-
     float value;
     *m_buffer >> value;
-
     return value;
 }
 
 double RandomByteBufferReader::readDouble()
 {
     inc();
-
     double value;
     *m_buffer >> value;
-
     return value;
 }
 
 qint64 RandomByteBufferReader::readLong()
 {
     inc();
-
     qint64 value;
     *m_buffer >> value;
-
     return value - m_seed;
+}
+
+QList<int> RandomByteBufferReader::readIntArray()
+{
+    int size = readInt();
+    QList<int> data = QList<int>();
+
+    for (int i = 0; i < size; ++i) {
+        data[i] = this->readInt();
+    }
+
+    return data;
 }
 
 QString RandomByteBufferReader::readString()
 {
-    int size;
+    int size = readInt();
     QByteArray data;
 
-    *m_buffer >> size;
-
     for (int i = 0; i < size; ++i) {
-        data.append(readByte());
+        qint8 value;
+        *m_buffer >> value;
+        data[i] = value;
     };
 
-    return QString(data);
+    return QString::fromUtf8(data);
 }
 
 //===========================

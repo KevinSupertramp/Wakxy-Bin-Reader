@@ -10,11 +10,12 @@ class BinaryDocumentIndex : public QObject
 
 public:
     BinaryDocumentIndex(RandomByteBufferReader* reader);
+    QString getName() { return m_name; }
+    QMap<qint64, QList<int> > getIndexes() { return m_indexes; }
 
-signals:
-
-public slots:
-
+private:
+    QString m_name;
+    QMap<qint64, QList<int> > m_indexes;
 };
 
 #endif // BINARYDOCUMENTINDEX_H
