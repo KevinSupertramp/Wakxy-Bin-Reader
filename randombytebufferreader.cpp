@@ -77,7 +77,7 @@ qint64 RandomByteBufferReader::readLong()
     inc();
     qint64 value;
     *m_buffer >> value;
-    return value - m_seed;
+    return (qint64)value - m_seed;
 }
 
 QList<int> RandomByteBufferReader::readIntArray()
@@ -86,7 +86,7 @@ QList<int> RandomByteBufferReader::readIntArray()
     QList<int> data = QList<int>();
 
     for (int i = 0; i < size; ++i) {
-        data[i] = this->readInt();
+        data.append(this->readInt());
     }
 
     return data;
