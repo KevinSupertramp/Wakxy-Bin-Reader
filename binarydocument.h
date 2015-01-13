@@ -6,6 +6,8 @@
 #include <QBitArray>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QScriptEngine>
+#include <QMap>
 
 #include "binarydocumentindex.h"
 #include "randombytebufferreader.h"
@@ -65,7 +67,10 @@ private:
     //data ==============
     QByteArray m_dataByteArray;
     RandomByteBufferReader* m_dataBuffer;
-    void ReadLine();
+    QList<QString> m_dataColumns; //data columns
+    QMap<int, QMap<QString, QString> > m_dataRows; //data rows
+
+    void ReadData();
     //==================
 };
 

@@ -92,3 +92,16 @@ void BinaryDocument::readHeader()
     randomBuffer->deleteLater(); //delete not needed anymore
     m_dataBuffer = new RandomByteBufferReader(m_dataByteArray, 0, m_dataTypeId, m_version);
 }
+
+void BinaryDocument::ReadData()
+{
+    QScriptEngine engine;
+
+    engine.globalObject().setProperty("reader", engine.newQObject(this)); //@TODO create slot only for script ?
+    QScriptValue script = engine.evaluate(""); //@TODO load script file
+
+    if(script.isError())//@TODO error message
+        return;
+
+    //else ok
+}
