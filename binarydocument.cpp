@@ -99,37 +99,31 @@ void BinaryDocument::readData()
     if(!m_dataBuffer)
         return;
 
-    //==================
-    //script path look like
-    //{APPLICATIONDIR}/scripts/{VERSION}/{DATATYPEID}.js
-    //
-    //script basic implements
-    //function readLine()
-    //{
-    //}
-    //readLine();
-    //==================
+    BinaryDocumentScript* binDocumentScript = new BinaryDocumentScript(m_dataBuffer);
+    QString script = binDocumentScript->getScript(m_version, m_dataTypeId);
+    if(script.isEmpty())
+        return;
 
     qint64 max = m_dataBuffer->size(); //max
 
+    //script loaded now
     QScriptEngine engine;
-    BinaryDocumentScript* binDocumentScript = new BinaryDocumentScript(m_dataBuffer);
-
     engine.globalObject().setProperty("buffer", engine.newQObject(binDocumentScript));
 
+    //read line
     for(int i = 0; i < m_entries.count(); i++)
     {
-        QScriptValue script = engine.evaluate(""); //@TODO load script file
+        QScriptValue scriptValue = engine.evaluate(script);
 
-        //=========
-        //thread ==
+        if(scriptValue.isError())//@TODO error message , one error quit
+            return;
+
+        //==============================
+        //thread =======================
         if(m_stop) return; //thread stop
         emit progressChanged(m_dataBuffer->position()*100/max); //update progress
         QThread::currentThread()->msleep(1); //1 ms sleep for signal
-        //=========
-
-        if(script.isError())//@TODO error message , one error quit
-            return;
+        //===============================
     }
 
     //adding data
