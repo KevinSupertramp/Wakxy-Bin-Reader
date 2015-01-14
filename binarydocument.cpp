@@ -33,6 +33,25 @@ void BinaryDocument::readDocument()
     readData();
 }
 
+void BinaryDocument::onNewDataRead(int row, QString columnName, QString previousColumn, QString value)
+{
+    //column
+
+    //if columnName isn't in the list
+    if(!m_dataColumns.contains(columnName))
+    {
+        //we search previousColumn
+        if(int index = m_dataColumns.indexOf(previousColumn) != -1)
+            m_dataColumns.insert(index, columnName); //and add this after
+    }
+    else //we push columnName at end
+        m_dataColumns.append(columnName);
+
+    //data
+    QMap<QString, QString>* data = &m_dataRows[row];
+    data->insert(columnName, value);
+}
+
 void BinaryDocument::readHeader()
 {
     //===========
@@ -100,6 +119,8 @@ void BinaryDocument::readData()
         return;
 
     BinaryDocumentScript* binDocumentScript = new BinaryDocumentScript(m_dataBuffer);
+    connect(binDocumentScript, SIGNAL(newDataRead(int, QString, QString, QString)), this, SLOT(onNewDataRead(int, QString,QString,QString)));
+
     QString script = binDocumentScript->getScript(m_version, m_dataTypeId);
     if(script.isEmpty())
         return;
@@ -117,6 +138,8 @@ void BinaryDocument::readData()
 
         if(scriptValue.isError())//@TODO error message , one error quit
             return;
+
+        binDocumentScript->newRow(); //inc row
 
         //==============================
         //thread =======================

@@ -3,6 +3,7 @@
 BinaryDocumentScript::BinaryDocumentScript(RandomByteBufferReader* bufferReader)
 {
     m_buffer = bufferReader;
+    m_row = 0;
 }
 
 QString BinaryDocumentScript::getScript(int version, int dataTypeId)
@@ -44,7 +45,60 @@ bool BinaryDocumentScript::loadScript(int version, int dataTypeId)
     //{
     //}
     //readLine();
-    //==================
 
     return true;
 }
+
+//=====================
+//SLOTS ===============
+//=====================
+
+void BinaryDocumentScript::readByte(QString columnName)
+{
+    qint8 value = m_buffer->readByte();
+    emit newDataRead(m_row, columnName, m_previousColumn, QString::number(value));
+    m_previousColumn = columnName;
+}
+
+void BinaryDocumentScript::readInt(QString columnName)
+{
+    int value = m_buffer->readInt();
+    emit newDataRead(m_row, columnName, m_previousColumn, QString::number(value));
+    m_previousColumn = columnName;
+}
+
+void BinaryDocumentScript::readBool(QString columnName)
+{
+    bool value = m_buffer->readBool();
+    emit newDataRead(m_row, columnName, m_previousColumn, QString::number(value));
+    m_previousColumn = columnName;
+}
+
+void BinaryDocumentScript::readShort(QString columnName)
+{
+    short value = m_buffer->readShort();
+    emit newDataRead(m_row, columnName, m_previousColumn, QString::number(value));
+    m_previousColumn = columnName;
+}
+
+void BinaryDocumentScript::readFloat(QString columnName)
+{
+    float value =m_buffer->readFloat();
+    emit newDataRead(m_row, columnName, m_previousColumn, QString::number(value));
+    m_previousColumn = columnName;
+}
+
+void BinaryDocumentScript::readDouble(QString columnName)
+{
+    double value = m_buffer->readDouble();
+    emit newDataRead(m_row, columnName, m_previousColumn, QString::number(value));
+    m_previousColumn = columnName;
+}
+
+void BinaryDocumentScript::readLong(QString columnName)
+{
+    qint64 value = m_buffer->readLong();
+    emit newDataRead(m_row, columnName, m_previousColumn, QString::number(value));
+    m_previousColumn = columnName;
+}
+

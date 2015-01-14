@@ -43,6 +43,7 @@ signals:
 
 public slots:
     void stopRead() { m_stop = true; }
+    void onNewDataRead(int row, QString columnName, QString previousColumn, QString value);
 
 protected:
     void readHeader();
