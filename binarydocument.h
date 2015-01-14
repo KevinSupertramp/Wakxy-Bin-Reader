@@ -11,6 +11,7 @@
 
 #include "binarydocumentindex.h"
 #include "randombytebufferreader.h"
+#include "binarydocumentscript.h"
 
 #define BINARYDOCUMENT_VERSION_OFFSET 756423
 
@@ -70,7 +71,7 @@ private:
     QList<QString> m_dataColumns; //data columns
     QMap<int, QMap<QString, QString> > m_dataRows; //data rows
 
-    void ReadData();
+    void readData();
     //==================
 };
 

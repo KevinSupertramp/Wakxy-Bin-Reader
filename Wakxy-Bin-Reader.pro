@@ -16,11 +16,13 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     binarydocument.cpp \
     binarydocumentindex.cpp \
-    randombytebufferreader.cpp
+    randombytebufferreader.cpp \
+    binarydocumentscript.cpp
 
 HEADERS  += mainwindow.h \
     binarydocument.h \
     binarydocumentindex.h \
-    randombytebufferreader.h
+    randombytebufferreader.h \
+    binarydocumentscript.h
 
 FORMS    += mainwindow.ui

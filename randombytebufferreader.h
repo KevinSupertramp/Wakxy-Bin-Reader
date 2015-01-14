@@ -15,6 +15,7 @@ public:
     ~RandomByteBufferReader();
 
     qint64 position() { return m_buffer->device()->pos(); }
+    qint64 size() { return m_buffer->device()->size(); }
 
     qint8 readByte(); //get() in RandomByteBuffer.java
     int readInt();

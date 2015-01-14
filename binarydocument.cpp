@@ -30,6 +30,7 @@ BinaryDocument::~BinaryDocument()
 void BinaryDocument::readDocument()
 {
     readHeader();
+    readData();
 }
 
 void BinaryDocument::readHeader()
@@ -86,22 +87,54 @@ void BinaryDocument::readHeader()
     //=================
     //data ============
     qint64 finalPosition = randomBuffer->position();
-    emit progressChanged(finalPosition*100/max); //thread update
+    emit progressChanged(finalPosition*100/max); //progress update
 
     m_dataByteArray = m_fileByteArray.right(finalPosition);
     randomBuffer->deleteLater(); //delete not needed anymore
     m_dataBuffer = new RandomByteBufferReader(m_dataByteArray, 0, m_dataTypeId, m_version);
 }
 
-void BinaryDocument::ReadData()
+void BinaryDocument::readData()
 {
-    QScriptEngine engine;
-
-    engine.globalObject().setProperty("reader", engine.newQObject(this)); //@TODO create slot only for script ?
-    QScriptValue script = engine.evaluate(""); //@TODO load script file
-
-    if(script.isError())//@TODO error message
+    if(!m_dataBuffer)
         return;
 
-    //else ok
+    //==================
+    //script path look like
+    //{APPLICATIONDIR}/scripts/{VERSION}/{DATATYPEID}.js
+    //
+    //script basic implements
+    //function readLine()
+    //{
+    //}
+    //readLine();
+    //==================
+
+    qint64 max = m_dataBuffer->size(); //max
+
+    QScriptEngine engine;
+    BinaryDocumentScript* binDocumentScript = new BinaryDocumentScript(m_dataBuffer);
+
+    engine.globalObject().setProperty("buffer", engine.newQObject(binDocumentScript));
+
+    for(int i = 0; i < m_entries.count(); i++)
+    {
+        QScriptValue script = engine.evaluate(""); //@TODO load script file
+
+        //=========
+        //thread ==
+        if(m_stop) return; //thread stop
+        emit progressChanged(m_dataBuffer->position()*100/max); //update progress
+        QThread::currentThread()->msleep(1); //1 ms sleep for signal
+        //=========
+
+        if(script.isError())//@TODO error message , one error quit
+            return;
+    }
+
+    //adding data
+    //columns
+    //line
+
+    delete binDocumentScript; //not used anymore
 }
